@@ -1,0 +1,25 @@
+package wordsvirtuoso
+import java.io.File
+import kotlin.random.Random
+
+fun main(vararg filenames: String) = when {
+    filenames.size != 2 -> "Error: Wrong number of arguments."
+    !File(filenames[0]).exists() -> "Error: The words file ${filenames[0]} doesn't exist."
+    !File(filenames[1]).exists() -> "Error: The candidate words file ${filenames[1]} doesn't exist."
+    else -> when {
+        File(filenames[0]).amountOfInvalidWords > 0 -> "Error: ${File(filenames[0]).amountOfInvalidWords} invalid words were found in the ${filenames[0]} file."
+        File(filenames[1]).amountOfInvalidWords > 0 -> "Error: ${File(filenames[1]).amountOfInvalidWords} invalid words were found in the ${filenames[1]} file."
+        else -> File(filenames[1]).readLines().map { it.lowercase() }.count { s -> !File(filenames[0]).readLines().map { it.lowercase() }.contains(s) }.let {
+            if (it > 0) "Error: $it candidate words are not included in the ${filenames[0]} file." else "Words Virtuoso"
+        }
+    }
+}.printlnIt()
+
+private val File.amountOfInvalidWords get() = this.readLines().count { it.hasNotFiveCharacters() || it.hasInvalidCharacters() || it.hasDuplicateCharacters() }
+private fun String.hasNotFiveCharacters() = this.length != 5
+private fun String.hasInvalidCharacters() = this.contains("[^a-zA-Z]".toRegex())
+private fun String.hasDuplicateCharacters() = this.length != this.toCharArray().distinct().size
+private fun String.printlnIt() = println(this)
+
+// select randomly a word
+val wordSelected = File(filenames[1]).readLines()
